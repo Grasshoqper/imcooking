@@ -7,12 +7,12 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class Robot extends TimedRobot {
   //Motors:
-  CANSparkMax driveLeftA = new CANSparkMax(3, MotorType.kBrushless);
-  CANSparkMax driveLeftB = new CANSparkMax(4, MotorType.kBrushless);
-  CANSparkMax driveRightA = new CANSparkMax(5, MotorType.kBrushless);
-  CANSparkMax driveRightB = new CANSparkMax(6, MotorType.kBrushless);
-  CANSparkMax intakePivot = new CANSparkMax(9, MotorType.kBrushless);
-  CANSparkMax intake = new CANSparkMax(10, MotorType.kBrushless);
+  CANSparkMax driveLeftA = new CANSparkMax(4, MotorType.kBrushed);
+  CANSparkMax driveLeftB = new CANSparkMax(5, MotorType.kBrushed);
+  CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
+  CANSparkMax driveRightB = new CANSparkMax(10, MotorType.kBrushed);
+  CANSparkMax intakePivot = new CANSparkMax(2, MotorType.kBrushless);
+  CANSparkMax intake = new CANSparkMax(7, MotorType.kBrushless);
   
   XboxController driveController = new XboxController(0);
 
@@ -35,13 +35,9 @@ public class Robot extends TimedRobot {
   public void robotInit() {
   //Directionals
   driveLeftA.setInverted(true);
-  driveLeftA.burnFlash();
   driveLeftB.setInverted(true);
-  driveLeftB.burnFlash();
   driveRightA.setInverted(false);
-  driveRightA.burnFlash();
   driveRightB.setInverted(false);
-  driveRightB.burnFlash();
 
 
   //Setting Motors Off
@@ -93,11 +89,11 @@ public class Robot extends TimedRobot {
     boolean intakePivotInOn = driveController.getAButtonPressed();
     boolean intakePivotInOff = driveController.getAButtonReleased();
 
-    if (intakePivotInOn) 
+    if (intakePivotInOn) //Pulling intake into the robot
     {
       intakePivot.set(intakePivotSpeed);
     } 
-    else if (intakePivotInOff) 
+    else if (intakePivotInOff) //Putting intake out of the robot
     {
       intakePivot.set(0);
     }
@@ -106,6 +102,9 @@ public class Robot extends TimedRobot {
     {
       intakePivot.set(0);
     }
+
+
+  
 
   }
 
