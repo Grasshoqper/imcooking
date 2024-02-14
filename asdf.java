@@ -11,25 +11,13 @@ public class Robot extends TimedRobot {
   CANSparkMax driveLeftB = new CANSparkMax(5, MotorType.kBrushed);
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
   CANSparkMax driveRightB = new CANSparkMax(10, MotorType.kBrushed);
-  CANSparkMax intakePivot = new CANSparkMax(2, MotorType.kBrushless);
-  CANSparkMax intake = new CANSparkMax(7, MotorType.kBrushless);
+  CANSparkMax intakePivot = new CANSparkMax(6, MotorType.kBrushless);
+  CANSparkMax intake = new CANSparkMax(2, MotorType.kBrushless);
+  CANSparkMax flywheelA = new CANSparkMax(1, MotorType.kBrushless);
+  CANSparkMax flywheelB = new CANSparkMax(7, MotorType.kBrushless);
+
   
   XboxController driveController = new XboxController(0);
-
-  //Variable Thingys:
-
-  //Drive
-  double turn;
-  double forward;
-
-  //Intake
-  double in;
-  double out; 
-
-  //Intake Pivot
-  double intakePivotSpeed;
-
-
 
   @Override
   public void robotInit() {
@@ -38,7 +26,8 @@ public class Robot extends TimedRobot {
   driveLeftB.setInverted(true);
   driveRightA.setInverted(false);
   driveRightB.setInverted(false);
-
+  flywheelA.setInverted(false);
+  flywheelB.setInverted(true);
 
   //Setting Motors Off
   driveLeftA.set(0);
@@ -47,6 +36,8 @@ public class Robot extends TimedRobot {
   driveRightB.set(0);
   intakePivot.set(0);
   intake.set(0);
+  flywheelA.set(0);
+  flywheelB.set(0);
   }
   @Override
   public void robotPeriodic() {
@@ -79,28 +70,82 @@ public class Robot extends TimedRobot {
     double in = driveController.getLeftTriggerAxis();
     double out = driveController.getRightTriggerAxis();
     
-    double intakePower = in - out;
+    double intakeSpeed = in - out;
+    double outakeSpeed = -0.5;
   
-    intake.set(intakePower);
+    intake.set(intakeSpeed);
+
 
     //Intake Pivot
     double intakePivotSpeed = 0.6;
+    double intakePivotOutSpeed = -0.6;
 
-    boolean intakePivotInOn = driveController.getAButtonPressed();
+    boolean intakePivotIn = driveController.getAButtonPressed();
     boolean intakePivotInOff = driveController.getAButtonReleased();
 
-    if (intakePivotInOn) //Pulling intake into the robot
+    boolean intakePivotOut = driveController.getXButtonPressed();
+    boolean intakePivotOutOff = driveController.getXButtonReleased();
+
+
+    if (intakePivotIn) //Pulling intake into the robot
     {
       intakePivot.set(intakePivotSpeed);
     } 
-    else if (intakePivotInOff) //Putting intake out of the robot
+    else if (intakePivotInOff) //Shutting motor off when realeasing button
     {
       intakePivot.set(0);
     }
 
-    if (intakePivotInOn && intakePivotInOff) // If your trying to turn pivot both ways it shuts motor off
+    if (intakePivotOut) //Putting intake out
+    {
+      intakePivot.set(intakePivotOutSpeed);
+    }
+    else if (intakePivotOutOff) //Shutting motor off when releasing button
     {
       intakePivot.set(0);
+    }
+
+    if (intakePivotIn && intakePivotInOff) // If your trying to turn pivot both ways it shuts motor off
+    {
+      intakePivot.set(0);
+    }
+
+    //Flywheels
+    double speakerSpeed = 0.7;
+    double ampSpeed = 0.4;
+
+    //Amp
+    boolean ampSequence = driveController.getYButtonPressed();
+    boolean ampSequenceOff = driveController.getYButtonReleased();
+
+    if (ampSequence) //Amp stuff
+    {
+      flywheelA.set(ampSpeed);
+      flywheelB.set(ampSpeed - 0.05);
+      intake.set(outakeSpeed + 0.2);
+    }
+    else if (ampSequenceOff) //Amp stuff over
+    {
+      flywheelA.set(0);
+      flywheelB.set(0);
+    }
+
+
+    //Speaker
+    boolean speakerSequence = driveController.getBButtonPressed();
+    boolean speakerSequenceOff = driveController.getBButtonReleased();
+
+    if (speakerSequence)
+    {
+      flywheelA.set(speakerSpeed);
+      flywheelB.set(speakerSpeed - 0.05);
+      intake.set(outakeSpeed);
+    }
+    else if (speakerSequenceOff)
+    {
+      flywheelA.set(0);
+      flywheelB.set(0);
+      intake.set(0);
     }
 
 
@@ -117,6 +162,8 @@ public class Robot extends TimedRobot {
   driveRightB.set(0);
   intakePivot.set(0);
   intake.set(0);
+  flywheelA.set(0);
+  flywheelB.set(0);
 
   }
   @Override
