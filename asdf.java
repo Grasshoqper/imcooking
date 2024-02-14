@@ -13,8 +13,8 @@ public class Robot extends TimedRobot {
   CANSparkMax driveRightB = new CANSparkMax(10, MotorType.kBrushed);
   CANSparkMax intakePivot = new CANSparkMax(6, MotorType.kBrushless);
   CANSparkMax intake = new CANSparkMax(2, MotorType.kBrushless);
-  CANSparkMax flywheelA = new CANSparkMax(1, MotorType.kBrushless);
-  CANSparkMax flywheelB = new CANSparkMax(7, MotorType.kBrushless);
+  CANSparkMax flywheelA = new CANSparkMax(7, MotorType.kBrushless);
+  CANSparkMax flywheelB = new CANSparkMax(1, MotorType.kBrushless);
 
   
   XboxController driveController = new XboxController(0);
@@ -78,7 +78,6 @@ public class Robot extends TimedRobot {
 
     //Intake Pivot
     double intakePivotSpeed = 0.6;
-    double intakePivotOutSpeed = -0.6;
 
     boolean intakePivotIn = driveController.getAButtonPressed();
     boolean intakePivotInOff = driveController.getAButtonReleased();
@@ -98,7 +97,7 @@ public class Robot extends TimedRobot {
 
     if (intakePivotOut) //Putting intake out
     {
-      intakePivot.set(intakePivotOutSpeed);
+      intakePivot.set(-intakePivotSpeed);
     }
     else if (intakePivotOutOff) //Shutting motor off when releasing button
     {
@@ -122,7 +121,7 @@ public class Robot extends TimedRobot {
     {
       flywheelA.set(ampSpeed);
       flywheelB.set(ampSpeed - 0.05);
-      intake.set(outakeSpeed + 0.2);
+      
     }
     else if (ampSequenceOff) //Amp stuff over
     {
@@ -139,13 +138,13 @@ public class Robot extends TimedRobot {
     {
       flywheelA.set(speakerSpeed);
       flywheelB.set(speakerSpeed - 0.05);
-      intake.set(outakeSpeed);
+      
     }
     else if (speakerSequenceOff)
     {
       flywheelA.set(0);
       flywheelB.set(0);
-      intake.set(0);
+      
     }
 
 
