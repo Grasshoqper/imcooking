@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -12,11 +13,12 @@ public class Robot extends TimedRobot {
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
   CANSparkMax driveRightB = new CANSparkMax(10, MotorType.kBrushed);
   CANSparkMax intakePivot = new CANSparkMax(6, MotorType.kBrushless);
-  CANSparkMax intake = new CANSparkMax(2, MotorType.kBrushless);
-  CANSparkMax flywheelA = new CANSparkMax(7, MotorType.kBrushless);
-  CANSparkMax flywheelB = new CANSparkMax(1, MotorType.kBrushless);
+  CANSparkMax intake = new CANSparkMax(1, MotorType.kBrushless);
+  CANSparkMax flywheelRight = new CANSparkMax(2, MotorType.kBrushless);
+  CANSparkMax flywheelLeft = new CANSparkMax(7, MotorType.kBrushless);
+  CANSparkMax climbRight = new CANSparkMax(3, MotorType.kBrushless);
+  CANSparkMax climbLeft = new CANSparkMax(8, MotorType.kBrushless);
 
-  
   XboxController driveController = new XboxController(0);
 
   @Override
@@ -26,8 +28,8 @@ public class Robot extends TimedRobot {
   driveLeftB.setInverted(true);
   driveRightA.setInverted(false);
   driveRightB.setInverted(false);
-  flywheelA.setInverted(false);
-  flywheelB.setInverted(true);
+  flywheelRight.setInverted(false);
+  flywheelLeft.setInverted(true);
 
   //Setting Motors Off
   driveLeftA.set(0);
@@ -36,8 +38,8 @@ public class Robot extends TimedRobot {
   driveRightB.set(0);
   intakePivot.set(0);
   intake.set(0);
-  flywheelA.set(0);
-  flywheelB.set(0);
+  flywheelRight.set(0);
+  flywheelLeft.set(0);
   }
   @Override
   public void robotPeriodic() {
@@ -53,6 +55,13 @@ public class Robot extends TimedRobot {
   driveRightA.set(driveRightPower);
   driveRightB.set(driveRightPower);
   
+  boolean flipTurn = driveController.getLeftStickButtonPressed();
+
+  if (flipTurn) //Flip the turn when the left joystick pressed
+  {
+    turn *= -1;
+  }
+
   }
 
   @Override
@@ -65,7 +74,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {}
 
   @Override
-  public void teleopPeriodic() {
+  public void teleopPeriodic() {  
     //Intake:
     double in = driveController.getLeftTriggerAxis();
     double out = driveController.getRightTriggerAxis();
@@ -78,13 +87,13 @@ public class Robot extends TimedRobot {
 
     //Intake Pivot
     double intakePivotSpeed = 0.6;
+    double intakePivotOutSpeed = -0.6;
 
     boolean intakePivotIn = driveController.getAButtonPressed();
     boolean intakePivotInOff = driveController.getAButtonReleased();
 
     boolean intakePivotOut = driveController.getXButtonPressed();
     boolean intakePivotOutOff = driveController.getXButtonReleased();
-
 
     if (intakePivotIn) //Pulling intake into the robot
     {
@@ -97,20 +106,16 @@ public class Robot extends TimedRobot {
 
     if (intakePivotOut) //Putting intake out
     {
-      intakePivot.set(-intakePivotSpeed);
+      intakePivot.set(intakePivotOutSpeed);
     }
     else if (intakePivotOutOff) //Shutting motor off when releasing button
     {
       intakePivot.set(0);
     }
 
-    if (intakePivotIn && intakePivotInOff) // If your trying to turn pivot both ways it shuts motor off
-    {
-      intakePivot.set(0);
-    }
 
     //Flywheels
-    double speakerSpeed = 0.7;
+    double speakerSpeed = 1;
     double ampSpeed = 0.4;
 
     //Amp
@@ -119,14 +124,14 @@ public class Robot extends TimedRobot {
 
     if (ampSequence) //Amp stuff
     {
-      flywheelA.set(ampSpeed);
-      flywheelB.set(ampSpeed - 0.05);
-      
+      flywheelRight.set(ampSpeed);
+      flywheelLeft.set(ampSpeed - 0.05);
+      intake.set(outakeSpeed + 0.2);
     }
     else if (ampSequenceOff) //Amp stuff over
     {
-      flywheelA.set(0);
-      flywheelB.set(0);
+      flywheelRight.set(0);
+      flywheelLeft.set(0);
     }
 
 
@@ -136,15 +141,15 @@ public class Robot extends TimedRobot {
 
     if (speakerSequence)
     {
-      flywheelA.set(speakerSpeed);
-      flywheelB.set(speakerSpeed - 0.05);
-      
+      flywheelRight.set(speakerSpeed);
+      flywheelLeft.set(speakerSpeed - 0.05);
+      intake.set(outakeSpeed);
     }
     else if (speakerSequenceOff)
     {
-      flywheelA.set(0);
-      flywheelB.set(0);
-      
+      flywheelRight.set(0);
+      flywheelLeft.set(0);
+      intake.set(0);
     }
 
 
@@ -161,8 +166,8 @@ public class Robot extends TimedRobot {
   driveRightB.set(0);
   intakePivot.set(0);
   intake.set(0);
-  flywheelA.set(0);
-  flywheelB.set(0);
+  flywheelRight.set(0);
+  flywheelLeft.set(0);
 
   }
   @Override
