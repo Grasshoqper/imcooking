@@ -21,8 +21,8 @@ public class Robot extends TimedRobot {
   CANSparkMax driveRightB = new CANSparkMax(11, MotorType.kBrushed);
 
   // controllers
-  XboxController driveControllerA = new XboxController(0);
-  XboxController driveControllerB = new XboxController(1);
+  XboxController driveControllerA = new XboxController(1);
+  XboxController driveControllerB = new XboxController(0);
 
   // encoders
   private RelativeEncoder intakePivotEncoder;
