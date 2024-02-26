@@ -8,17 +8,16 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class Robot extends TimedRobot {
   // motors
-  CANSparkMax intake = new CANSparkMax(1, MotorType.kBrushless);
-  CANSparkMax flywheelLeft = new CANSparkMax(2, MotorType.kBrushless);
-  CANSparkMax flap = new CANSparkMax(3, MotorType.kBrushless);
-  CANSparkMax climbLeft = new CANSparkMax(4, MotorType.kBrushless);
-  CANSparkMax driveLeftA = new CANSparkMax(5, MotorType.kBrushed);
-  CANSparkMax driveLeftB = new CANSparkMax(6, MotorType.kBrushed);
-  CANSparkMax flywheelRight = new CANSparkMax(7, MotorType.kBrushless);
-  CANSparkMax intakePivot = new CANSparkMax(8, MotorType.kBrushless);
-  CANSparkMax climbRight = new CANSparkMax(9, MotorType.kBrushless);
-  CANSparkMax driveRightA = new CANSparkMax(10, MotorType.kBrushed);
-  CANSparkMax driveRightB = new CANSparkMax(11, MotorType.kBrushed);
+  CANSparkMax intake = new CANSparkMax(7, MotorType.kBrushless);
+  CANSparkMax flywheelLeft = new CANSparkMax(1, MotorType.kBrushless);
+  CANSparkMax climb left = new CANSparkMax(3, MotorType.kBrushless);
+  CANSparkMax driveLeftA = new CANSparkMax(4, MotorType.kBrushed);
+  CANSparkMax driveLeftB = new CANSparkMax(5, MotorType.kBrushed);
+  CANSparkMax flywheelRight = new CANSparkMax(6, MotorType.kBrushless);
+  CANSparkMax intakePivot = new CANSparkMax(2, MotorType.kBrushless);
+  CANSparkMax climbRight = new CANSparkMax(8, MotorType.kBrushless);
+  CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
+  CANSparkMax driveRightB = new CANSparkMax(10, MotorType.kBrushed);
 
   // controllers
   XboxController driveControllerA = new XboxController(1);
@@ -32,7 +31,6 @@ public class Robot extends TimedRobot {
   // directionals
   intake.setInverted(false);
   flywheelLeft.setInverted(true);
-  flap.setInverted(false);
   climbLeft.setInverted(true);
   driveLeftA.setInverted(true);
   driveLeftB.setInverted(true);
@@ -45,7 +43,6 @@ public class Robot extends TimedRobot {
   // set all speeds 0
   intake.set(0);
   flywheelLeft.set(0);
-  flap.set(0);
   climbLeft.set(0);
   driveLeftA.set(0);
   driveLeftB.set(0);
@@ -172,7 +169,6 @@ public class Robot extends TimedRobot {
   // set all speeds 0
   intake.set(0);
   flywheelLeft.set(0);
-  flap.set(0);
   climbLeft.set(0);
   driveLeftA.set(0);
   driveLeftB.set(0);
