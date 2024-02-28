@@ -8,16 +8,16 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class Robot extends TimedRobot {
   // motors
-  CANSparkMax intake = new CANSparkMax(7, MotorType.kBrushless);
-  CANSparkMax flywheelLeft = new CANSparkMax(5, MotorType.kBrushless);
+  CANSparkMax intake = new CANSparkMax(4, MotorType.kBrushless);
+  CANSparkMax flywheelLeft = new CANSparkMax(10, MotorType.kBrushless);
   CANSparkMax climbleft = new CANSparkMax(3, MotorType.kBrushless);
   CANSparkMax driveLeftA = new CANSparkMax(2, MotorType.kBrushed);
   CANSparkMax driveLeftB = new CANSparkMax(1, MotorType.kBrushed);
   CANSparkMax flywheelRight = new CANSparkMax(6, MotorType.kBrushless);
-  CANSparkMax intakePivot = new CANSparkMax(4, MotorType.kBrushless);
+  CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
   CANSparkMax climbRight = new CANSparkMax(8, MotorType.kBrushless);
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
-  CANSparkMax driveRightB = new CANSparkMax(10, MotorType.kBrushed);
+  CANSparkMax driveRightB = new CANSparkMax(5, MotorType.kBrushed);
 
   // controllers
   XboxController driveControllerA = new XboxController(1);
