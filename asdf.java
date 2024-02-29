@@ -148,15 +148,6 @@ public class Robot extends TimedRobot {
     double rightTriggerAxis = driveControllerA.getRightTriggerAxis();
     double leftTriggerAxis = driveControllerA.getLeftTriggerAxis();
 
-    while (rightTriggerAxis > 0.25) // intake
-    {
-      intake.set(intakeSpeed);
-    }
-    
-    while (leftTriggerAxis > 0.25) // outake
-    {
-      intake.set(outakeSpeed);
-    }
 
    
 
