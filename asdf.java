@@ -5,17 +5,18 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
   // motors
   CANSparkMax intake = new CANSparkMax(4, MotorType.kBrushless);
   CANSparkMax flywheelLeft = new CANSparkMax(10, MotorType.kBrushless);
-  CANSparkMax climbleft = new CANSparkMax(3, MotorType.kBrushless);
+
   CANSparkMax driveLeftA = new CANSparkMax(2, MotorType.kBrushed);
   CANSparkMax driveLeftB = new CANSparkMax(1, MotorType.kBrushed);
   CANSparkMax flywheelRight = new CANSparkMax(6, MotorType.kBrushless);
   CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
-  CANSparkMax climbRight = new CANSparkMax(8, MotorType.kBrushless);
+
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
   CANSparkMax driveRightB = new CANSparkMax(5, MotorType.kBrushed);
 
@@ -31,24 +32,24 @@ public class Robot extends TimedRobot {
   // directionals
   intake.setInverted(false);
   flywheelLeft.setInverted(true);
-  climbLeft.setInverted(true);
+
   driveLeftA.setInverted(true);
   driveLeftB.setInverted(true);
   flywheelRight.setInverted(false);
   intakePivot.setInverted(false);
-  climbRight.setInverted(false);
+
   driveRightA.setInverted(false);
   driveRightB.setInverted(false);
 
   // set all speeds 0
   intake.set(0);
   flywheelLeft.set(0);
-  climbLeft.set(0);
+
   driveLeftA.set(0);
   driveLeftB.set(0);
   flywheelRight.set(0);
   intakePivot.set(0);
-  climbRight.set(0);
+
   driveRightA.set(0);
   driveRightB.set(0);
   
@@ -157,13 +158,9 @@ public class Robot extends TimedRobot {
       intake.set(outakeSpeed);
     }
 
-    // climb
+   
 
-    double climbRightSpeed = driveControllerB.getRightY();
-    double climbLeftSpeed = driveControllerB.getLeftY();
 
-    climbRight.set(climbRightSpeed);
-    climbLeft.set(climbLeftSpeed);
 
   }
 
@@ -172,12 +169,12 @@ public class Robot extends TimedRobot {
   // set all speeds 0
   intake.set(0);
   flywheelLeft.set(0);
-  climbLeft.set(0);
+
   driveLeftA.set(0);
   driveLeftB.set(0);
   flywheelRight.set(0);
   intakePivot.set(0);
-  climbRight.set(0);
+
   driveRightA.set(0);
   driveRightB.set(0);
   }
