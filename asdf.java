@@ -75,6 +75,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
+    SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
+    
     // drive
     double forward = -driveControllerA.getLeftY();
     double turn = -driveControllerA.getRightX();
