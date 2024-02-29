@@ -91,10 +91,7 @@ public class Robot extends TimedRobot {
     driveRightA.set(driveRightPower);
     driveRightB.set(driveRightPower);
 
-    while (forward < 0) // flip turn while reversing
-    {
-      turn = -turn;
-    }
+    
   
     // intake pivot
     
@@ -147,6 +144,9 @@ public class Robot extends TimedRobot {
 
     double rightTriggerAxis = driveControllerA.getRightTriggerAxis();
     double leftTriggerAxis = driveControllerA.getLeftTriggerAxis();
+
+    intake.set(driveControllerA.getLeftTriggerAxis());
+    intake.set(-driveControllerA.getRightTriggerAxis());
 
 
    
