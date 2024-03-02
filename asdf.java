@@ -83,10 +83,6 @@ public class Robot extends TimedRobot {
     double forward = -driveControllerA.getLeftY();
     double turn = -driveControllerA.getRightX();
 
-    while (forward > 0) {
-      turn = -turn;
-    }
-    
     double driveLeftPower = forward - turn;
     double driveRightPower = forward + turn;
 
