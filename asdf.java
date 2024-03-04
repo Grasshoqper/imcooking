@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 
   // drive
 
-  tankDrive = new DifferentialDrive(driveLeftA, driveRightA);
+  
 
   
 
@@ -84,8 +84,9 @@ public class Robot extends TimedRobot {
 
   double setpoint = 0;
 
-  SlewRateLimiter driveLimiter = new SlewRateLimiter(0.25);
-  SlewRateLimiter turnLimiter = new SlewRateLimiter(0.5);
+
+
+  
 
   @Override
   public void teleopPeriodic() {
@@ -94,7 +95,16 @@ public class Robot extends TimedRobot {
     //SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
     
     // drive
-    tankDrive.tankDrive(driveLimiter.calculate(driveControllerA.getLeftY()), turnLimiter.calculate(driveControllerA.getRightX()));
+    double forward = -driveControllerA.getLeftY();
+    double turn = -driveControllerA.getRightX();
+
+    double driveLeftPower = forward - turn;
+    double driveRightPower = forward + turn;
+
+    driveLeftA.set(driveLeftPower);
+    
+    driveRightA.set(driveRightPower);
+    
 
     // get sensor position
     //double sensorPosition = intakePivotEncoder.getPosition();
@@ -143,7 +153,7 @@ public class Robot extends TimedRobot {
     // intake & outake
 
       // regular
-    intake.set(driveControllerA.getRightTriggerAxis() - driveControllerA.getLeftTriggerAxis());
+    intake.set(driveControllerA.getLeftTriggerAxis() - driveControllerA.getRightTriggerAxis());
 
       // amp outake
     if (driveControllerB.getRightBumperPressed()) 
