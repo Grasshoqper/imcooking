@@ -26,6 +26,7 @@ public class Robot extends TimedRobot {
 
   // encoders
   //private RelativeEncoder intakePivotEncoder;
+  private RelativeEncoder flywheelEncoder;
 
   // drive
   private DifferentialDrive tankDrive;
@@ -55,6 +56,7 @@ public class Robot extends TimedRobot {
   
   // encoders
   //intakePivotEncoder = intakePivot.getEncoder();
+  flywheelEncoder = flywheelLeft.getEncoder();
 
   // setting slave motors
   driveLeftB.follow(driveLeftA);
@@ -93,7 +95,7 @@ public class Robot extends TimedRobot {
 
 
     //SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
-    
+    SmartDashboard.putNumber("Encoder Position", flywheelEncoder.getPosition());
     // drive
     double forward = -driveControllerA.getLeftY();
     double turn = -driveControllerA.getRightX();
@@ -137,16 +139,10 @@ public class Robot extends TimedRobot {
 
     double speakerSpeed = 100;
 
-    if (driveControllerB.getBButtonPressed()) // set flywheels to speaker speed
+    /*if (driveControllerB.getBButton()) 
     {
-      flywheelLeft.set(speakerSpeed);
-      flywheelRight.set(speakerSpeed - 5);
-    }
-    else if (driveControllerB.getBButtonReleased()) // set flywheels to 0 on release
-    {
-      flywheelLeft.set(0);
-      flywheelRight.set(0);
-    }
+      double flywheelPosition = 
+    }*/
 
     
 
