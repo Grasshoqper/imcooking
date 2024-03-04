@@ -1,22 +1,22 @@
 package frc.robot;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
   // motors
   CANSparkMax intake = new CANSparkMax(4, MotorType.kBrushless);
   CANSparkMax flywheelLeft = new CANSparkMax(10, MotorType.kBrushless);
-
   CANSparkMax driveLeftA = new CANSparkMax(2, MotorType.kBrushed);
   CANSparkMax driveLeftB = new CANSparkMax(1, MotorType.kBrushed);
   CANSparkMax flywheelRight = new CANSparkMax(6, MotorType.kBrushless);
-  CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
-
+  //CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
   CANSparkMax driveRightB = new CANSparkMax(5, MotorType.kBrushed);
 
@@ -25,21 +25,21 @@ public class Robot extends TimedRobot {
   XboxController driveControllerB = new XboxController(0);
 
   // encoders
-  private RelativeEncoder intakePivotEncoder;
+  //private RelativeEncoder intakePivotEncoder;
+
+  // drive
+  private DifferentialDrive tankDrive;
 
   @Override 
   public void robotInit() {
   // directionals
   intake.setInverted(false);
   flywheelLeft.setInverted(true);
-
   driveLeftA.setInverted(true);
-  driveLeftB.setInverted(true);
   flywheelRight.setInverted(false);
-  intakePivot.setInverted(false);
-
+  //intakePivot.setInverted(false);
   driveRightA.setInverted(false);
-  driveRightB.setInverted(false);
+
 
   // set all speeds 0
   intake.set(0);
@@ -48,13 +48,23 @@ public class Robot extends TimedRobot {
   driveLeftA.set(0);
   driveLeftB.set(0);
   flywheelRight.set(0);
-  intakePivot.set(0);
+  //intakePivot.set(0);
 
   driveRightA.set(0);
   driveRightB.set(0);
   
   // encoders
-  intakePivotEncoder = intakePivot.getEncoder();
+  //intakePivotEncoder = intakePivot.getEncoder();
+
+  // setting slave motors
+  driveLeftB.follow(driveLeftA);
+  driveRightB.follow(driveRightA);
+
+  // drive
+
+  tankDrive = new DifferentialDrive(driveLeftA, driveRightA);
+
+  
 
   }
   @Override
@@ -74,49 +84,42 @@ public class Robot extends TimedRobot {
 
   double setpoint = 0;
 
+  SlewRateLimiter driveLimiter = new SlewRateLimiter(0.25);
+  SlewRateLimiter turnLimiter = new SlewRateLimiter(0.5);
+
   @Override
   public void teleopPeriodic() {
 
-    SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
+
+    //SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
     
     // drive
-    double forward = -driveControllerA.getLeftY();
-    double turn = -driveControllerA.getRightX();
+    tankDrive.tankDrive(driveLimiter.calculate(driveControllerA.getLeftY()), turnLimiter.calculate(driveControllerA.getRightX()));
 
-    double driveLeftPower = forward - turn;
-    double driveRightPower = forward + turn;
-
-    driveLeftA.set(driveLeftPower);
-    driveLeftB.set(driveLeftPower);
-    driveRightA.set(driveRightPower);
-    driveRightB.set(driveRightPower);
-
-    
-  
-    // intake pivot
-    
     // get sensor position
-    double sensorPosition = intakePivotEncoder.getPosition();
+    //double sensorPosition = intakePivotEncoder.getPosition();
 
     // calculations
-    double error = setpoint - sensorPosition;
+   /* double error = setpoint - sensorPosition;
 
     double outputSpeed = kP * error;
 
-    if (driveControllerB.getAButton()) // intake down/out
+    // intake pivot
+    if (driveControllerA.getRightBumper()) // intake down/out
     {
       setpoint = 100;
     }
-    else if (driveControllerB.getXButton()) // intake up/in
+    else if (driveControllerB.getRightBumper()) // intake up/in
     {
       setpoint = 0;
     }
-    else if (driveControllerB.getYButton()) // amp 
+    else if (driveControllerB.getLeftBumper()) // amp 
     {
       setpoint = 50;
     }
 
     intakePivot.set(outputSpeed); // setting pivot motor to the pid calculations
+    */
   
   // flywheels/speaker
     
@@ -139,15 +142,18 @@ public class Robot extends TimedRobot {
 
     // intake & outake
 
-    double intakeSpeed = 1;
-    double outakeSpeed = - 0.5;
+      // regular
+    intake.set(driveControllerA.getRightTriggerAxis() - driveControllerA.getLeftTriggerAxis());
 
-    double rightTriggerAxis = driveControllerA.getRightTriggerAxis();
-    double leftTriggerAxis = driveControllerA.getLeftTriggerAxis();
-
-    intake.set(driveControllerA.getLeftTriggerAxis());
-    intake.set(-driveControllerA.getRightTriggerAxis());
-
+      // amp outake
+    if (driveControllerB.getRightBumperPressed()) 
+    {
+      intake.set(0.25);
+    }
+    else if (driveControllerB.getRightBumperReleased())
+    {
+      intake.set(0);
+    }
 
    
 
@@ -164,7 +170,7 @@ public class Robot extends TimedRobot {
   driveLeftA.set(0);
   driveLeftB.set(0);
   flywheelRight.set(0);
-  intakePivot.set(0);
+  //intakePivot.set(0);
 
   driveRightA.set(0);
   driveRightB.set(0);
