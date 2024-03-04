@@ -58,6 +58,8 @@ public class Robot extends TimedRobot {
   //intakePivotEncoder = intakePivot.getEncoder();
   flywheelEncoder = flywheelLeft.getEncoder();
 
+  
+
   // setting slave motors
   driveLeftB.follow(driveLeftA);
   driveRightB.follow(driveRightA);
@@ -87,7 +89,10 @@ public class Robot extends TimedRobot {
   double setpoint = 0;
 
 
+  private double revTime = 0.0;
+  private double endShoot = 0.0;
 
+  private boolean buttonPressed = false;
   
 
   @Override
@@ -154,31 +159,33 @@ public class Robot extends TimedRobot {
       // amp outake
 
     double flywheelPositionActive = flywheelEncoder.getPosition();
-    
-    if (driveControllerA.getRightBumper()) 
-    {
+
+    if (driveControllerA.getRightBumper() && !buttonPressed) {
       double flywheelPosition = flywheelEncoder.getPosition();
-      double revTime = flywheelPosition + 140;
-      double endShoot = flywheelPosition + 200;
-      if (flywheelPositionActive < endShoot)
-      {
+      revTime = flywheelPosition + 140;
+      endShoot = flywheelPosition + 200;
+
+      buttonPressed = true;
+
+      
+    }
+    
+    if (flywheelPositionActive < endShoot) {
       flywheelLeft.set(100);
       flywheelRight.set(95);
-      }
-
-      if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime)
-      {
-        intake.set(50);
-      } 
-
-      if (flywheelPosition > endShoot)
-      {
-        flywheelLeft.set(0);
-        flywheelRight.set(0);
-        intake.set(0);
-      }
     }
-   
+
+    if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) {
+      intake.set(-25);
+    }
+
+    if (flywheelPositionActive > endShoot) {
+      flywheelLeft.set(0);
+      flywheelRight.set(0);
+      intake.set(0);
+
+      buttonPressed = false;
+    }
 
 
 
