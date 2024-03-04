@@ -152,15 +152,32 @@ public class Robot extends TimedRobot {
     intake.set(driveControllerA.getLeftTriggerAxis() - driveControllerA.getRightTriggerAxis());
 
       // amp outake
-    if (driveControllerB.getRightBumperPressed()) 
-    {
-      intake.set(0.25);
-    }
-    else if (driveControllerB.getRightBumperReleased())
-    {
-      intake.set(0);
-    }
 
+    double flywheelPositionActive = flywheelEncoder.getPosition();
+    
+    if (driveControllerA.getRightBumper()) 
+    {
+      double flywheelPosition = flywheelEncoder.getPosition();
+      double revTime = flywheelPosition + 140;
+      double endShoot = flywheelPosition + 200;
+      if (flywheelPositionActive < endShoot)
+      {
+      flywheelLeft.set(100);
+      flywheelRight.set(95);
+      }
+
+      if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime)
+      {
+        intake.set(50);
+      } 
+
+      if (flywheelPosition > endShoot)
+      {
+        flywheelLeft.set(0);
+        flywheelRight.set(0);
+        intake.set(0);
+      }
+    }
    
 
 
