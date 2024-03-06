@@ -19,7 +19,7 @@ public class Robot extends TimedRobot {
   //CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
   CANSparkMax driveRightB = new CANSparkMax(5, MotorType.kBrushed);
-
+  
   // controllers
   XboxController driveControllerA = new XboxController(1);
   XboxController driveControllerB = new XboxController(0);
@@ -29,7 +29,8 @@ public class Robot extends TimedRobot {
   private RelativeEncoder flywheelEncoder;
 
   // drive
-  private DifferentialDrive tankDrive;
+  DifferentialDrive drive = new DifferentialDrive(driveLeftA, driveRightA);
+
 
   @Override 
   public void robotInit() {
@@ -58,6 +59,8 @@ public class Robot extends TimedRobot {
   //intakePivotEncoder = intakePivot.getEncoder();
   flywheelEncoder = flywheelLeft.getEncoder();
 
+  flywheelEncoder.setPosition(0);
+  //intakePivotEncoder.setPosition(0);
   
 
   // setting slave motors
@@ -65,7 +68,7 @@ public class Robot extends TimedRobot {
   driveRightB.follow(driveRightA);
 
   // drive
-
+  
   
 
   
@@ -93,25 +96,21 @@ public class Robot extends TimedRobot {
   private double endShoot = 0.0;
 
   private boolean buttonPressed = false;
-  
 
+  private boolean intakeActive = false;
+  private boolean outakeActive = false;
+
+  SlewRateLimiter driveLimiter = new SlewRateLimiter(0.15);
+  SlewRateLimiter turnLimiter = new SlewRateLimiter(0.25);
+  
   @Override
   public void teleopPeriodic() {
-
-
+    // encoders
     //SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
     SmartDashboard.putNumber("Encoder Position", flywheelEncoder.getPosition());
+
     // drive
-    double forward = -driveControllerA.getLeftY();
-    double turn = -driveControllerA.getRightX();
-
-    double driveLeftPower = forward - turn;
-    double driveRightPower = forward + turn;
-
-    driveLeftA.set(driveLeftPower);
-    
-    driveRightA.set(driveRightPower);
-    
+    drive.tankDrive(driveLimiter.calculate(driveControllerA.getLeftY()), turnLimiter.calculate(driveControllerA.getRightX()));
 
     // get sensor position
     //double sensorPosition = intakePivotEncoder.getPosition();
@@ -149,14 +148,29 @@ public class Robot extends TimedRobot {
       double flywheelPosition = 
     }*/
 
-    
+    // intake
+    if (driveControllerA.getLeftTriggerAxis() > 0.25 && !intakeActive)
+    {
+      intake.set(0.75);
+      intakeActive = true;
+    }
+    else if (driveControllerA.getLeftTriggerAxis() < 0.25 && intakeActive)
+    {
+      intake.set(0);
+      intakeActive = false;
+    }
 
-    // intake & outake
-
-      // regular
-    intake.set(driveControllerA.getLeftTriggerAxis() - driveControllerA.getRightTriggerAxis());
-
-      // amp outake
+    // outake
+    if (driveControllerA.getRightTriggerAxis() > 0.25 && !outakeActive) 
+    {
+      intake.set(0.4);
+      outakeActive = true;
+    }
+    else if (driveControllerA.getRightTriggerAxis() < 0.25 && outakeActive)
+    {
+      intake.set(0);
+      outakeActive = false;
+    }
 
     double flywheelPositionActive = flywheelEncoder.getPosition();
 
@@ -166,20 +180,21 @@ public class Robot extends TimedRobot {
       endShoot = flywheelPosition + 200;
 
       buttonPressed = true;
-
-      
     }
     
-    if (flywheelPositionActive < endShoot) {
-      flywheelLeft.set(100);
-      flywheelRight.set(95);
+    if (flywheelPositionActive < endShoot) 
+    {
+      flywheelLeft.set(1);
+      flywheelRight.set(0.95);
     }
 
-    if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) {
-      intake.set(-25);
+    if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) 
+    {
+      intake.set(-0.25);
     }
 
-    if (flywheelPositionActive > endShoot) {
+    if (flywheelPositionActive > endShoot && buttonPressed) 
+    {
       flywheelLeft.set(0);
       flywheelRight.set(0);
       intake.set(0);
