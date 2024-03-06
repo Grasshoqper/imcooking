@@ -1,12 +1,13 @@
 package frc.robot;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
+
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
@@ -27,6 +28,9 @@ public class Robot extends TimedRobot {
   // encoders
   //private RelativeEncoder intakePivotEncoder;
   private RelativeEncoder flywheelEncoder;
+
+  Encoder driveLeftEncoder;
+  Encoder driveRightEncoder;
 
   // drive
   
@@ -62,6 +66,9 @@ public class Robot extends TimedRobot {
   flywheelEncoder.setPosition(0);
   //intakePivotEncoder.setPosition(0);
   
+  driveRightEncoder = new Encoder(0,1);
+  driveLeftEncoder = new Encoder(2, 3);
+
 
   // setting slave motors
   driveLeftB.follow(driveLeftA);
@@ -72,16 +79,73 @@ public class Robot extends TimedRobot {
   
 
   
+  // auto 
+  m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+  m_chooser.addOption("My Auto", kCustomAuto);
+  SmartDashboard.putData("Auto choices", m_chooser);
 
   }
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    double driveRightDistance = driveRightEncoder.getDistance();
+    double driveLeftDistance = driveLeftEncoder.getDistance();
+
+    SmartDashboard.putNumber("Right Drive", driveRightDistance);
+    SmartDashboard.putNumber("Left Drive", driveLeftDistance);
+  }
+
+  private static final String kDefaultAuto = "Default";
+  private static final String kCustomAuto = "My Auto";
+  private String m_autoSelected;
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    m_autoSelected = m_chooser.getSelected();
+    System.out.println("Auto selected: " + m_autoSelected);
+  }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+
+    double flywheelPositionActive = flywheelEncoder.getPosition();
+
+    switch (m_autoSelected) {
+      case kCustomAuto:
+        double flywheelPosition = flywheelEncoder.getPosition();
+        revTime = flywheelPosition + 140;
+        endShoot = flywheelPosition + 200;
+
+        buttonPressed = true;
+    
+      if (flywheelPositionActive < endShoot) 
+      {
+        flywheelLeft.set(1);
+        flywheelRight.set(0.95);
+      }
+
+      if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) 
+      {
+        intake.set(-0.25);
+      }
+
+    if (flywheelPositionActive > endShoot && buttonPressed) 
+    {
+        flywheelLeft.set(0);
+        flywheelRight.set(0);
+        intake.set(0);
+
+        buttonPressed = false;
+        boolean speakerSequenceOver = true;
+    }
+
+        break;
+      case kDefaultAuto:
+      default:
+
+        break;
+    }
+  }
 
   @Override
   public void teleopInit() {
@@ -100,8 +164,6 @@ public class Robot extends TimedRobot {
   private boolean intakeActive = false;
   private boolean outakeActive = false;
 
-  //SlewRateLimiter driveLimiter = new SlewRateLimiter(10);
-  //SlewRateLimiter turnLimiter = new SlewRateLimiter(2);
   
   @Override
   public void teleopPeriodic() {
@@ -146,7 +208,7 @@ public class Robot extends TimedRobot {
     
     // speaker
 
-    double speakerSpeed = 100;
+
 
     /*if (driveControllerB.getBButton()) 
     {
@@ -156,7 +218,7 @@ public class Robot extends TimedRobot {
     // intake
     if (driveControllerA.getLeftTriggerAxis() > 0.25 && !intakeActive)
     {
-      intake.set(0.75);
+      intake.set(0.35);
       intakeActive = true;
     }
     else if (driveControllerA.getLeftTriggerAxis() < 0.25 && intakeActive)
