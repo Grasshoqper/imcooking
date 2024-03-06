@@ -103,20 +103,21 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
+    
   }
 
   @Override
   public void autonomousPeriodic() {
 
-    double flywheelPositionActive = flywheelEncoder.getPosition();
+    
 
     switch (m_autoSelected) {
       case kCustomAuto:
-        double flywheelPosition = flywheelEncoder.getPosition();
-        revTime = flywheelPosition + 140;
-        endShoot = flywheelPosition + 200;
-
-        buttonPressed = true;
+        double flywheelPositionActive = flywheelEncoder.getPosition();
+        
+        double revTime = 140;
+        double endShoot = 200;
+        
     
       if (flywheelPositionActive < endShoot) 
       {
@@ -129,7 +130,7 @@ public class Robot extends TimedRobot {
         intake.set(-0.25);
       }
 
-    if (flywheelPositionActive > endShoot && buttonPressed) 
+    if (flywheelPositionActive > endShoot) 
     {
         flywheelLeft.set(0);
         flywheelRight.set(0);
@@ -170,7 +171,7 @@ public class Robot extends TimedRobot {
     // encoders
     //SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
     SmartDashboard.putNumber("Encoder Position", flywheelEncoder.getPosition());
-
+    
     // drive
     double forward = -driveControllerA.getLeftY();
     double turn = -driveControllerA.getRightX();
