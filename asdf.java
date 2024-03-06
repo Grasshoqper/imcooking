@@ -21,15 +21,15 @@ public class Robot extends TimedRobot {
   CANSparkMax driveRightB = new CANSparkMax(5, MotorType.kBrushed);
   
   // controllers
-  XboxController driveControllerA = new XboxController(1);
-  XboxController driveControllerB = new XboxController(0);
+  XboxController driveControllerA = new XboxController(0);
+  XboxController driveControllerB = new XboxController(1);
 
   // encoders
   //private RelativeEncoder intakePivotEncoder;
   private RelativeEncoder flywheelEncoder;
 
   // drive
-  DifferentialDrive drive = new DifferentialDrive(driveLeftA, driveRightA);
+  
 
 
   @Override 
@@ -100,8 +100,8 @@ public class Robot extends TimedRobot {
   private boolean intakeActive = false;
   private boolean outakeActive = false;
 
-  SlewRateLimiter driveLimiter = new SlewRateLimiter(0.15);
-  SlewRateLimiter turnLimiter = new SlewRateLimiter(0.25);
+  //SlewRateLimiter driveLimiter = new SlewRateLimiter(10);
+  //SlewRateLimiter turnLimiter = new SlewRateLimiter(2);
   
   @Override
   public void teleopPeriodic() {
@@ -110,8 +110,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Encoder Position", flywheelEncoder.getPosition());
 
     // drive
-    drive.tankDrive(driveLimiter.calculate(driveControllerA.getLeftY()), turnLimiter.calculate(driveControllerA.getRightX()));
-
+    double forward = -driveControllerA.getLeftY();
+    double turn = -driveControllerA.getRightX();
+    double driveLeftPower = forward - turn;
+    double driveRightPower = forward + turn;
+    driveLeftA.set(driveLeftPower);
+    
+    driveRightA.set(driveRightPower);
     // get sensor position
     //double sensorPosition = intakePivotEncoder.getPosition();
 
