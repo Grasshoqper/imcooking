@@ -9,6 +9,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 
 public class Robot extends TimedRobot {
   // motors
@@ -33,7 +35,7 @@ public class Robot extends TimedRobot {
   Encoder driveRightEncoder;
 
   // drive
-  
+  AHRS navx;
 
 
   @Override 
@@ -75,14 +77,16 @@ public class Robot extends TimedRobot {
   driveRightB.follow(driveRightA);
 
   // drive
-  
-  
+
+
 
   
   // auto 
-  m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-  m_chooser.addOption("My Auto", kCustomAuto);
+  m_chooser.setDefaultOption("Default Auto", DefaultAuto);
+  m_chooser.addOption("My Auto", LeftTwoNoteAuto);
   SmartDashboard.putData("Auto choices", m_chooser);
+
+  navx = new AHRS(SPI.Port.kMXP); 
 
   }
   @Override
@@ -94,8 +98,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Left Drive", driveLeftDistance);
   }
 
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  private static final String DefaultAuto = "Default";
+  private static final String LeftTwoNoteAuto = "Left Two Note";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -103,16 +107,20 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
-    
-  }
 
+    flywheelEncoder.setPosition(0);
+
+  }
+  boolean speakerSequenceOver = false;
+  double driveAngle;
+  boolean autoPart2 = false;
   @Override
   public void autonomousPeriodic() {
 
-    
+    double driveAngle = navx.getAngle();
 
     switch (m_autoSelected) {
-      case kCustomAuto:
+      case LeftTwoNoteAuto:
         double flywheelPositionActive = flywheelEncoder.getPosition();
         
         double revTime = 140;
@@ -141,9 +149,46 @@ public class Robot extends TimedRobot {
     }
 
         break;
-      case kDefaultAuto:
+      case DefaultAuto:
       default:
+        flywheelPositionActive = flywheelEncoder.getPosition();
+        
+        revTime = 140;
+        endShoot = 200;
+        
+    
+      if (flywheelPositionActive < endShoot) 
+      {
+        flywheelLeft.set(1);
+        flywheelRight.set(0.95);
+      }
 
+      if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) 
+      {
+        intake.set(-0.25);
+      }
+
+    if (flywheelPositionActive > endShoot) 
+    {
+        flywheelLeft.set(0);
+        flywheelRight.set(0);
+        intake.set(0);
+
+        buttonPressed = false;
+        speakerSequenceOver = true;
+    }
+    if (speakerSequenceOver) 
+    {
+      driveLeftA.set(0.8);
+      driveRightA.set(0.5);
+      autoPart2 = true;
+    } 
+    if (driveAngle > 44.25 && autoPart2)
+    {
+      driveLeftA.set(0);
+      driveRightA.set(0);
+      autoPart2 = false;
+    }
         break;
     }
   }
@@ -184,7 +229,7 @@ public class Robot extends TimedRobot {
     //double sensorPosition = intakePivotEncoder.getPosition();
 
     // calculations
-   /* double error = setpoint - sensorPosition;
+    /*double error = setpoint - sensorPosition;
 
     double outputSpeed = kP * error;
 
