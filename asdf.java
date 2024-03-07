@@ -1,6 +1,5 @@
 package frc.robot;
 
-
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.CANSparkMax;
@@ -19,7 +18,7 @@ public class Robot extends TimedRobot {
   CANSparkMax driveLeftA = new CANSparkMax(2, MotorType.kBrushed);
   CANSparkMax driveLeftB = new CANSparkMax(1, MotorType.kBrushed);
   CANSparkMax flywheelRight = new CANSparkMax(6, MotorType.kBrushless);
-  //CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
+  CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
   CANSparkMax driveRightB = new CANSparkMax(5, MotorType.kBrushed);
   
@@ -28,7 +27,7 @@ public class Robot extends TimedRobot {
   XboxController driveControllerB = new XboxController(1);
 
   // encoders
-  //private RelativeEncoder intakePivotEncoder;
+  private RelativeEncoder intakePivotEncoder;
   private RelativeEncoder flywheelEncoder;
 
   Encoder driveLeftEncoder;
@@ -45,7 +44,7 @@ public class Robot extends TimedRobot {
   flywheelLeft.setInverted(true);
   driveLeftA.setInverted(true);
   flywheelRight.setInverted(false);
-  //intakePivot.setInverted(false);
+  intakePivot.setInverted(false);
   driveRightA.setInverted(false);
 
 
@@ -62,11 +61,11 @@ public class Robot extends TimedRobot {
   driveRightB.set(0);
   
   // encoders
-  //intakePivotEncoder = intakePivot.getEncoder();
+  intakePivotEncoder = intakePivot.getEncoder();
   flywheelEncoder = flywheelLeft.getEncoder();
 
   flywheelEncoder.setPosition(0);
-  //intakePivotEncoder.setPosition(0);
+  intakePivotEncoder.setPosition(0);
   
   driveRightEncoder = new Encoder(0,1);
   driveLeftEncoder = new Encoder(2, 3);
@@ -214,7 +213,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // encoders
-    //SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
+    SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
     SmartDashboard.putNumber("Encoder Position", flywheelEncoder.getPosition());
     
     // drive
@@ -226,10 +225,10 @@ public class Robot extends TimedRobot {
     
     driveRightA.set(driveRightPower);
     // get sensor position
-    //double sensorPosition = intakePivotEncoder.getPosition();
+    double sensorPosition = intakePivotEncoder.getPosition();
 
     // calculations
-    /*double error = setpoint - sensorPosition;
+    double error = setpoint - sensorPosition;
 
     double outputSpeed = kP * error;
 
@@ -248,7 +247,7 @@ public class Robot extends TimedRobot {
     }
 
     intakePivot.set(outputSpeed); // setting pivot motor to the pid calculations
-    */
+    
   
   // flywheels/speaker
     
@@ -256,10 +255,7 @@ public class Robot extends TimedRobot {
 
 
 
-    /*if (driveControllerB.getBButton()) 
-    {
-      double flywheelPosition = 
-    }*/
+   
 
     // intake
     if (driveControllerA.getLeftTriggerAxis() > 0.25 && !intakeActive)
