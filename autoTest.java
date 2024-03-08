@@ -67,8 +67,11 @@ public class Robot extends TimedRobot {
   flywheelEncoder.setPosition(0);
   intakePivotEncoder.setPosition(0);
   
-  driveRightEncoder = new Encoder(0,1);
-  driveLeftEncoder = new Encoder(2, 3);
+  driveRightEncoder = new Encoder(0,1, false, EncodingType.k4X);
+  driveLeftEncoder = new Encoder(2, 3, true, EncodingType.k4X);
+  driveRightEncoder.setDistancePerPulse(4);
+  driveLeftEncoder.setDistancePerPulse(4);
+
 
 
   // setting slave motors
