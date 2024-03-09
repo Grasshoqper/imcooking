@@ -235,15 +235,15 @@ public class Robot extends TimedRobot {
     // intake pivot
     if (driveControllerA.getRightBumper()) // intake down/out
     {
-      setpoint = 100;
+      setpoint = 55.25;
     }
     else if (driveControllerB.getRightBumper()) // intake up/in
     {
-      setpoint = 0;
+      setpoint = 0.75;
     }
     else if (driveControllerB.getLeftBumper()) // amp 
     {
-      setpoint = 50;
+      setpoint = 26;
     }
 
     intakePivot.set(outputSpeed); // setting pivot motor to the pid calculations
