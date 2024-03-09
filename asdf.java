@@ -198,7 +198,7 @@ public class Robot extends TimedRobot {
   }
   final double kP = 0.05;
 
-  double setpoint = 0;
+  double setpoint = 0.5;
 
 
   private double revTime = 0.0;
