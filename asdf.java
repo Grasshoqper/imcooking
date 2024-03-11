@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.CANSparkMax;
@@ -55,7 +56,7 @@ public class Robot extends TimedRobot {
   driveLeftA.set(0);
   driveLeftB.set(0);
   flywheelRight.set(0);
-  //intakePivot.set(0);
+  intakePivot.set(0);
 
   driveRightA.set(0);
   driveRightB.set(0);
@@ -86,6 +87,8 @@ public class Robot extends TimedRobot {
   SmartDashboard.putData("Auto choices", m_chooser);
 
   navx = new AHRS(SPI.Port.kMXP); 
+
+  CameraServer.startAutomaticCapture("camera", 0);
 
   }
   @Override
@@ -196,9 +199,9 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
 
   }
-  final double kP = 0.05;
+  final double kP = 0.015;
 
-  double setpoint = 0.5;
+  double setpoint = 0.0;
 
 
   private double revTime = 0.0;
@@ -209,12 +212,14 @@ public class Robot extends TimedRobot {
   private boolean intakeActive = false;
   private boolean outakeActive = false;
 
-  
+  private boolean intakeMoving = true;  
   @Override
   public void teleopPeriodic() {
     // encoders
     SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
     SmartDashboard.putNumber("Encoder Position", flywheelEncoder.getPosition());
+
+    
     
     // drive
     double forward = -driveControllerA.getLeftY();
@@ -233,15 +238,15 @@ public class Robot extends TimedRobot {
     double outputSpeed = kP * error;
 
     // intake pivot
-    if (driveControllerA.getRightBumper()) // intake down/out
+    if (driveControllerA.getLeftBumper()) // intake down/out
     {
       setpoint = 55.25;
     }
-    else if (driveControllerB.getRightBumper()) // intake up/in
+    else if (driveControllerB.getLeftBumper()) // intake up/in
     {
       setpoint = 0.75;
     }
-    else if (driveControllerB.getLeftBumper()) // amp 
+    else if (driveControllerB.getRightBumper()) // amp 
     {
       setpoint = 26;
     }
@@ -258,24 +263,24 @@ public class Robot extends TimedRobot {
    
 
     // intake
-    if (driveControllerA.getLeftTriggerAxis() > 0.25 && !intakeActive)
+    if (driveControllerA.getLeftTriggerAxis() > 0.5 && !intakeActive)
     {
       intake.set(0.35);
       intakeActive = true;
     }
-    else if (driveControllerA.getLeftTriggerAxis() < 0.25 && intakeActive)
+    else if (driveControllerA.getLeftTriggerAxis() < 0.5 && intakeActive)
     {
       intake.set(0);
       intakeActive = false;
     }
 
     // outake
-    if (driveControllerA.getRightTriggerAxis() > 0.25 && !outakeActive) 
+    if (driveControllerA.getRightTriggerAxis() > 0.5 && !outakeActive) 
     {
-      intake.set(0.4);
+      intake.set(-0.1);
       outakeActive = true;
     }
-    else if (driveControllerA.getRightTriggerAxis() < 0.25 && outakeActive)
+    else if (driveControllerA.getRightTriggerAxis() < 0.5 && outakeActive)
     {
       intake.set(0);
       outakeActive = false;
@@ -285,8 +290,8 @@ public class Robot extends TimedRobot {
 
     if (driveControllerA.getRightBumper() && !buttonPressed) {
       double flywheelPosition = flywheelEncoder.getPosition();
-      revTime = flywheelPosition + 140;
-      endShoot = flywheelPosition + 200;
+      revTime = flywheelPosition + 150;
+      endShoot = flywheelPosition + 250;
 
       buttonPressed = true;
     }
@@ -297,21 +302,36 @@ public class Robot extends TimedRobot {
       flywheelRight.set(0.95);
     }
 
-    if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) 
+    if (flywheelPositionActive > revTime) 
     {
       intake.set(-0.25);
-    }
-
-    if (flywheelPositionActive > endShoot && buttonPressed) 
+      if (flywheelPositionActive > endShoot && buttonPressed) 
     {
+      
       flywheelLeft.set(0);
       flywheelRight.set(0);
-      intake.set(0);
 
+      intake.set(0);
       buttonPressed = false;
     }
+    }
 
+    
 
+    double intakeVelocity = intakePivotEncoder.getVelocity();
+
+    SmartDashboard.putNumber("Intake Velocity", intakeVelocity);
+
+    if (driveControllerB.getAButtonPressed())
+    {
+      intake.set(-0.15);
+    }
+    else if (driveControllerB.getAButtonReleased())
+    {
+      intake.set(0);
+    }
+    
+    
 
   }
 
@@ -324,7 +344,7 @@ public class Robot extends TimedRobot {
   driveLeftA.set(0);
   driveLeftB.set(0);
   flywheelRight.set(0);
-  //intakePivot.set(0);
+  intakePivot.set(0);
 
   driveRightA.set(0);
   driveRightB.set(0);
