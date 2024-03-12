@@ -92,7 +92,7 @@ public class Robot extends TimedRobot {
   
   }
   
-  final double kP = 0.015;
+  final double kP = 0.009;
 
   double setpoint = 0;
 
@@ -114,7 +114,7 @@ public class Robot extends TimedRobot {
     double outputSpeed = kP * error;
 
     // intake pivot
-    if (driveControllerA.getLeftBumper()) // intake down/out
+    if (driveControllerB.getRightBumper()) // intake down/out
     {
       setpoint = 55.25;
     }
@@ -122,7 +122,7 @@ public class Robot extends TimedRobot {
     {
       setpoint = 0.75;
     }
-    else if (driveControllerB.getRightBumper()) // amp 
+    else if (driveControllerB.getAButton()) // amp 
     {
       setpoint = 26;
     }
@@ -337,7 +337,7 @@ public class Robot extends TimedRobot {
     // outake
     if (driveControllerA.getRightTriggerAxis() > 0.5 && !outakeActive) 
     {
-      intake.set(-0.1);
+      intake.set(-0.5);
       outakeActive = true;
     }
     else if (driveControllerA.getRightTriggerAxis() < 0.5 && outakeActive)
@@ -377,11 +377,11 @@ public class Robot extends TimedRobot {
     }
     
 
-    if (driveControllerB.getAButtonPressed())
+    if (driveControllerB.getBButtonPressed())
     {
       intake.set(-0.15);
     }
-    else if (driveControllerB.getAButtonReleased())
+    else if (driveControllerB.getBButtonReleased())
     {
       intake.set(0);
     }
