@@ -92,7 +92,7 @@ public class Robot extends TimedRobot {
   
   }
   
-  final double kP = 0.009;
+  final double kP = 0.015;
 
   double setpoint = 0;
 
@@ -116,23 +116,19 @@ public class Robot extends TimedRobot {
     // intake pivot
     if (driveControllerB.getRightBumper()) // intake down/out
     {
-      setpoint = 55.25;
+      setpoint = 16.25;
     }
     else if (driveControllerB.getLeftBumper()) // intake up/in
     {
-      setpoint = 0.75;
+      setpoint = 0.25;
     }
-    else if (driveControllerB.getAButton()) // amp 
-    {
-      setpoint = 26;
-    }
-
+    
     intakePivot.set(outputSpeed); // setting pivot motor to the pid calculations
 
     // intaking while moving
 
-    double plusSetpoint = setpoint + 5;
-    double minusSetpoint = setpoint - 5;
+    double plusSetpoint = setpoint + 1.5;
+    double minusSetpoint = setpoint - 1.5;
 
     if (!intakeMoving && sensorPosition < minusSetpoint || sensorPosition > plusSetpoint)
     {
@@ -232,7 +228,7 @@ public class Robot extends TimedRobot {
 
     if (autoPart2 && drivePosition > 50) 
     {
-      setpoint = 55.25;
+      setpoint = 16.25;
     }
 
     if (autoPart2 && drivePosition > 75)
@@ -245,7 +241,7 @@ public class Robot extends TimedRobot {
     if (autoPart3 && drivePosition > 95)
     {
       driveSetpoint = 0;
-      setpoint = 0;
+      setpoint = 0.25;
     } 
     if (autoPart3 && drivePosition < 15)
     {
