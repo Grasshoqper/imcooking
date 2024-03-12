@@ -1,12 +1,12 @@
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
   XboxController driveControllerA = new XboxController(0);
   XboxController driveControllerB = new XboxController(1);
 
-  // encoders
+  // encodershnbgf
   private RelativeEncoder intakePivotEncoder;
   private RelativeEncoder flywheelEncoder;
 
@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
   driveLeftA.set(0);
   driveLeftB.set(0);
   flywheelRight.set(0);
-  //intakePivot.set(0);
+  intakePivot.set(0);
 
   driveRightA.set(0);
   driveRightB.set(0);
@@ -68,10 +68,8 @@ public class Robot extends TimedRobot {
   flywheelEncoder.setPosition(0);
   intakePivotEncoder.setPosition(0);
   
-  driveRightEncoder = new Encoder(0,1, false, EncodingType.k4X);
-  driveLeftEncoder = new Encoder(2, 3, true, EncodingType.k4X);
-  driveRightEncoder.setDistancePerPulse(4);
-  driveLeftEncoder.setDistancePerPulse(4);
+  driveRightEncoder = new Encoder(0,1);
+  driveLeftEncoder = new Encoder(2, 3);
 
 
   // setting slave motors
@@ -84,15 +82,22 @@ public class Robot extends TimedRobot {
 
   
   // auto 
-  m_chooser.setDefaultOption("Default Auto", DefaultAuto);
-  m_chooser.addOption("My Auto", RightTwoNoteAuto);
+  m_chooser.setDefaultOption("Just Shoot", DefaultAuto);
+  m_chooser.addOption("Middle Two Note Auto", MiddleTwoNoteAuto);
   SmartDashboard.putData("Auto choices", m_chooser);
 
   navx = new AHRS(SPI.Port.kMXP); 
 
+  CameraServer.startAutomaticCapture("camera", 0);
   
-
   }
+  
+  final double kP = 0.015;
+
+  double setpoint = 0;
+
+  boolean intakeMoving = false;
+
   @Override
   public void robotPeriodic() {
     double driveRightDistance = driveRightEncoder.getDistance();
@@ -108,13 +113,45 @@ public class Robot extends TimedRobot {
 
     double outputSpeed = kP * error;
 
+    // intake pivot
+    if (driveControllerA.getLeftBumper()) // intake down/out
+    {
+      setpoint = 55.25;
+    }
+    else if (driveControllerB.getLeftBumper()) // intake up/in
+    {
+      setpoint = 0.75;
+    }
+    else if (driveControllerB.getRightBumper()) // amp 
+    {
+      setpoint = 26;
+    }
+
     intakePivot.set(outputSpeed); // setting pivot motor to the pid calculations
+
+    // intaking while moving
+    double intakeVelocity = intakePivotEncoder.getVelocity();
+
+    if (!intakeMoving && intakeVelocity > 1000 || intakeVelocity < -1000)
+    {
+      intake.set(0.15);
+      intakeMoving = true;
+    }
+    else if (intakeMoving && intakeVelocity < 1000 && intakeVelocity > -1000)
+    {
+      intake.set(0);
+      intakeMoving = false;
+    }
+
+    // flywheel encoder 
   }
 
   private static final String DefaultAuto = "Default";
-  private static final String RightTwoNoteAuto = "Left Two Note";
+  private static final String MiddleTwoNoteAuto = "Middle Two Note Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+  
 
   @Override
   public void autonomousInit() {
@@ -124,37 +161,104 @@ public class Robot extends TimedRobot {
     flywheelEncoder.setPosition(0);
 
   }
-  boolean autoPart1 = false;
+  boolean speakerSequenceOver = false;
+  double driveAngle;
   boolean autoPart2 = false;
   boolean autoPart3 = false;
-  boolean autoPart4 = false;
-  double driveAngle;
+
+  final double driveKP = 0.05;
+
   double driveSetpoint = 0;
-  double driveKP = 0.05;
+
+  private double revTime = 0.0;
+  private double endShoot = 0.0;
+
   @Override
   public void autonomousPeriodic() {
-    // right
-    double driveRightPosition = driveRightEncoder.getDistance();
-
-    double driveRightError = driveSetpoint - driveRightPosition;
-
-    double leftSideAuto = driveKP * driveRightError;
-
-    // left
-    double driveLeftPosition = driveLeftEncoder.getDistance();
-
-    double driveLeftError = driveSetpoint - driveLeftPosition;
-
-    double rightSideAuto = driveKP * driveLeftError;
-
     
+    double drivePosition = driveLeftEncoder.getDistance();
+
+    double driveError = setpoint - drivePosition;
+
+    double driveOutputSpeed = driveKP * driveError;             
 
     double driveAngle = navx.getAngle();
 
+
+
     switch (m_autoSelected) {
+      case MiddleTwoNoteAuto:
+    double flywheelPositionActive = flywheelEncoder.getPosition();
+    boolean flywheels = true;
+    
+    driveRightA.set(driveOutputSpeed);
+    driveRightB.set(driveOutputSpeed);
+
+    if (flywheels) {
+      double flywheelPosition = flywheelEncoder.getPosition();
+      revTime = flywheelPosition + 150;
+      endShoot = flywheelPosition + 250;
+    }
+    
+    if (flywheelPositionActive < endShoot && flywheels) 
+    {
+      flywheelLeft.set(1);
+      flywheelRight.set(0.95);
+    }
+
+    if (flywheelPositionActive > revTime && flywheels) 
+    {
+      intake.set(-0.25);
+      
+    }
+    if (flywheelPositionActive > endShoot && flywheels) 
+    {
+      flywheelLeft.set(0);
+      flywheelRight.set(0);
+      intake.set(0);
+
+      flywheels = false;
+      speakerSequenceOver = true;
+    }
+
+    if (speakerSequenceOver)
+    {
+      driveSetpoint = 100;
+      speakerSequenceOver = false;
+      autoPart2 = true;
+    }
+
+    if (autoPart2 && drivePosition > 50) 
+    {
+      setpoint = 55.25;
+    }
+
+    if (autoPart2 && drivePosition > 75)
+    {
+      intake.set(0.35);
+      autoPart2 = false;
+      autoPart3 = true;
+    }
+
+    if (autoPart3 && drivePosition > 95)
+    {
+      driveSetpoint = 0;
+      setpoint = 0;
+    } 
+    if (autoPart3 && drivePosition < 15)
+    {
+      flywheels = true;
+    }
+
+
+    if (speakerSequenceOver)
+
+
+
+        break;
       case DefaultAuto:
       default:
-        double flywheelPositionActive = flywheelEncoder.getPosition();
+        flywheelPositionActive = flywheelEncoder.getPosition();
         
         double revTime = 140;
         double endShoot = 200;
@@ -178,141 +282,63 @@ public class Robot extends TimedRobot {
         intake.set(0);
 
         buttonPressed = false;
-        boolean autoPart1 = true;
-    }
-
-        break;
-      case RightTwoNoteAuto:
-        flywheelPositionActive = flywheelEncoder.getPosition();
         
-        revTime = 140;
-        endShoot = 200;
-        
-    
-      if (flywheelPositionActive < endShoot) 
-      {
-        flywheelLeft.set(1);
-        flywheelRight.set(0.95);
-      }
-
-      if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) 
-      {
-        intake.set(-0.25);
-      }
-
-    if (flywheelPositionActive > endShoot) 
-    {
-        flywheelLeft.set(0);
-        flywheelRight.set(0);
-        intake.set(0);
-
-        buttonPressed = false;
-        autoPart1 = true;
-    }
-    if (autoPart1) 
-    {
-      driveLeftA.set(rightSideAuto);
-      driveRightA.set(rightSideAuto - 0.4);
-      autoPart1 = false;
-      autoPart2 = true;
-
-    } 
-    if (driveAngle > 44.25 && autoPart2)
-    {
-      driveLeftA.set(rightSideAuto);
-      driveRightA.set(rightSideAuto);
-      //setpoint = 0;
-      intake.set(0.4);
-      autoPart2 = false;
-      autoPart3 = true;
     }
         break;
     }
-
-
-
-
-
   }
 
   @Override
   public void teleopInit() {
 
   }
-  final double kP = 0.05;
-
-  double setpoint = 0;
+  
 
 
-  private double revTime = 0.0;
-  private double endShoot = 0.0;
 
   private boolean buttonPressed = false;
 
   private boolean intakeActive = false;
   private boolean outakeActive = false;
 
-  
   @Override
   public void teleopPeriodic() {
     // encoders
     SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
     SmartDashboard.putNumber("Encoder Position", flywheelEncoder.getPosition());
+
+    
     
     // drive
     double forward = -driveControllerA.getLeftY();
     double turn = -driveControllerA.getRightX();
     double driveLeftPower = forward - turn;
     double driveRightPower = forward + turn;
+
     driveLeftA.set(driveLeftPower);
-    
     driveRightA.set(driveRightPower);
-    // get sensor position
-
-    // intake pivot
-    if (driveControllerA.getRightBumper()) // intake down/out
-    {
-      setpoint = 100;
-    }
-    else if (driveControllerB.getRightBumper()) // intake up/in
-    {
-      setpoint = 0;
-    }
-    else if (driveControllerB.getLeftBumper()) // amp 
-    {
-      setpoint = 50;
-    }
-
     
     
   
-  // flywheels/speaker
-    
-    // speaker
-
-
-
-   
-
     // intake
-    if (driveControllerA.getLeftTriggerAxis() > 0.25 && !intakeActive)
+    if (driveControllerA.getLeftTriggerAxis() > 0.5 && !intakeActive)
     {
       intake.set(0.35);
       intakeActive = true;
     }
-    else if (driveControllerA.getLeftTriggerAxis() < 0.25 && intakeActive)
+    else if (driveControllerA.getLeftTriggerAxis() < 0.5 && intakeActive)
     {
       intake.set(0);
       intakeActive = false;
     }
 
     // outake
-    if (driveControllerA.getRightTriggerAxis() > 0.25 && !outakeActive) 
+    if (driveControllerA.getRightTriggerAxis() > 0.5 && !outakeActive) 
     {
-      intake.set(0.4);
+      intake.set(-0.1);
       outakeActive = true;
     }
-    else if (driveControllerA.getRightTriggerAxis() < 0.25 && outakeActive)
+    else if (driveControllerA.getRightTriggerAxis() < 0.5 && outakeActive)
     {
       intake.set(0);
       outakeActive = false;
@@ -322,8 +348,8 @@ public class Robot extends TimedRobot {
 
     if (driveControllerA.getRightBumper() && !buttonPressed) {
       double flywheelPosition = flywheelEncoder.getPosition();
-      revTime = flywheelPosition + 140;
-      endShoot = flywheelPosition + 200;
+      revTime = flywheelPosition + 150;
+      endShoot = flywheelPosition + 250;
 
       buttonPressed = true;
     }
@@ -334,11 +360,11 @@ public class Robot extends TimedRobot {
       flywheelRight.set(0.95);
     }
 
-    if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) 
+    if (flywheelPositionActive > revTime && buttonPressed) 
     {
       intake.set(-0.25);
+      
     }
-
     if (flywheelPositionActive > endShoot && buttonPressed) 
     {
       flywheelLeft.set(0);
@@ -347,8 +373,18 @@ public class Robot extends TimedRobot {
 
       buttonPressed = false;
     }
+    
 
-
+    if (driveControllerB.getAButtonPressed())
+    {
+      intake.set(-0.15);
+    }
+    else if (driveControllerB.getAButtonReleased())
+    {
+      intake.set(0);
+    }
+    
+    
 
   }
 
@@ -361,7 +397,7 @@ public class Robot extends TimedRobot {
   driveLeftA.set(0);
   driveLeftB.set(0);
   flywheelRight.set(0);
-  //intakePivot.set(0);
+  intakePivot.set(0);
 
   driveRightA.set(0);
   driveRightB.set(0);
