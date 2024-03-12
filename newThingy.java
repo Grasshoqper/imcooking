@@ -131,8 +131,8 @@ public class Robot extends TimedRobot {
 
     // intaking while moving
 
-    double plusSetpoint = setpoint + 7.5;
-    double minusSetpoint = setpoint - 7.5;
+    double plusSetpoint = setpoint + 5;
+    double minusSetpoint = setpoint - 5;
 
     if (!intakeMoving && sensorPosition < minusSetpoint || sensorPosition > plusSetpoint)
     {
