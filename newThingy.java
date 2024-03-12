@@ -130,14 +130,16 @@ public class Robot extends TimedRobot {
     intakePivot.set(outputSpeed); // setting pivot motor to the pid calculations
 
     // intaking while moving
-    double intakeVelocity = intakePivotEncoder.getVelocity();
 
-    if (!intakeMoving && intakeVelocity > 1000 || intakeVelocity < -1000)
+    double plusSetpoint = setpoint + 7.5;
+    double minusSetpoint = setpoint - 7.5;
+
+    if (!intakeMoving && sensorPosition < minusSetpoint || sensorPosition > plusSetpoint)
     {
       intake.set(0.15);
       intakeMoving = true;
     }
-    else if (intakeMoving && intakeVelocity < 1000 && intakeVelocity > -1000)
+    else if (intakeMoving && sensorPosition > minusSetpoint && sensorPosition < plusSetpoint)
     {
       intake.set(0);
       intakeMoving = false;
