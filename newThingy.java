@@ -115,6 +115,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Right Drive", driveRightDistance);
     SmartDashboard.putNumber("Left Drive", driveLeftDistance);
+    SmartDashboard.putNumber("drive setpoint", driveSetpoint);
 
     sensorPosition = intakePivotEncoder.getPosition();
 
