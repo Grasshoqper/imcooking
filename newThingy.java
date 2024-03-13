@@ -27,14 +27,14 @@ public class Robot extends TimedRobot {
   XboxController driveControllerA = new XboxController(0);
   XboxController driveControllerB = new XboxController(1);
 
-  // encodershnbgf
+  // encoders
   private RelativeEncoder intakePivotEncoder;
   private RelativeEncoder flywheelEncoder;
 
+  // drive
   Encoder driveLeftEncoder;
   Encoder driveRightEncoder;
 
-  // drive
   AHRS navx;
 
   
@@ -154,7 +154,7 @@ public class Robot extends TimedRobot {
     // auto drive 
     drivePosition = driveRightEncoder.getDistance();
 
-    driveError = setpoint - drivePosition;
+    driveError = driveSetpoint - drivePosition;
 
     driveOutputSpeed = driveKP * driveError;             
     
