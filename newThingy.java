@@ -37,9 +37,15 @@ public class Robot extends TimedRobot {
   // drive
   AHRS navx;
 
-  double driveOutputSpeed = 0; // Declare at class level
-  double drivePosition = 0; // Declare at class level
-  double driveError = 0; // Declare at class level
+  double driveSetpoint = 0;
+  double driveOutputSpeed = 0; 
+  double drivePosition = 0; 
+  double driveError = 0; 
+  double outputSpeed = 0;
+  double sensorPosition = 0;
+  double error = 0;
+
+
 
   @Override 
   public void robotInit() {
@@ -151,7 +157,7 @@ public class Robot extends TimedRobot {
 
     double driveOutputSpeed = driveKP * driveError;             
 
-    double driveAngle = navx.getAngle();
+    
   }
 
   private static final String DefaultAuto = "Default";
@@ -176,19 +182,18 @@ public class Robot extends TimedRobot {
 
   final double driveKP = 0.05;
 
-  double driveSetpoint = 0;
-
   private double revTime = 0.0;
   private double endShoot = 0.0;
 
   @Override
   public void autonomousPeriodic() {
 
-
+    double driveAngle = navx.getAngle();
+    double flywheelPositionActive = flywheelEncoder.getPosition();
 
     switch (m_autoSelected) {
       case MiddleTwoNoteAuto:
-    double flywheelPositionActive = flywheelEncoder.getPosition();
+
     boolean flywheels = true;
     
     driveRightA.set(driveOutputSpeed);
@@ -319,7 +324,8 @@ public class Robot extends TimedRobot {
     driveRightA.set(driveRightPower);
     
     
-  
+        
+
     // intake
     if (driveControllerA.getLeftTriggerAxis() > 0.5 && !intakeActive)
     {
@@ -345,44 +351,74 @@ public class Robot extends TimedRobot {
     }
 
     double flywheelPositionActive = flywheelEncoder.getPosition();
+    boolean speakers = false;   
 
-    if (driveControllerA.getRightBumper() && !buttonPressed) {
+    if (driveControllerA.getRightBumper() && !buttonPressed && !speakers) {
       double flywheelPosition = flywheelEncoder.getPosition();
       revTime = flywheelPosition + 150;
       endShoot = flywheelPosition + 250;
 
       buttonPressed = true;
+      speakers = true;
     }
     
-    if (flywheelPositionActive < endShoot) 
+    if (flywheelPositionActive < endShoot && speakers) 
     {
       flywheelLeft.set(1);
       flywheelRight.set(0.95);
     }
 
-    if (flywheelPositionActive > revTime && buttonPressed) 
+    if (flywheelPositionActive > revTime && buttonPressed && speakers) 
     {
       intake.set(-0.25);
       
     }
-    if (flywheelPositionActive > endShoot && buttonPressed) 
+
+    if (flywheelPositionActive > endShoot && buttonPressed && speakers) 
     {
       flywheelLeft.set(0);
       flywheelRight.set(0);
       intake.set(0);
 
       buttonPressed = false;
+      speakers = false;
+    }
+    
+    boolean amps = false;
+
+    if (driveControllerB.getBButton() && !buttonPressed && !amps) {
+      double flywheelPosition = flywheelEncoder.getPosition();
+      revTime = flywheelPosition + 25;
+      endShoot = flywheelPosition + 150;
+
+      buttonPressed = true;
+      amps = true;
+    }
+    
+    if (flywheelPositionActive < endShoot && amps) 
+    {
+      flywheelLeft.set(1);
+      flywheelRight.set(0.95);
+    }
+
+    if (flywheelPositionActive > revTime && buttonPressed && amps) 
+    {
+      intake.set(-0.25);
+      
+    }
+
+    if (flywheelPositionActive > endShoot && buttonPressed && amps) 
+    {
+      flywheelLeft.set(0);
+      flywheelRight.set(0);
+      intake.set(0);
+
+      buttonPressed = false;
+      amps = false;
     }
     
 
-    if (driveControllerB.getBButtonPressed())
-    {
-      intake.set(-0.15);
-    }
-    else if (driveControllerB.getBButtonReleased())
-    {
-      intake.set(0);
-    }
+    
     
     
 
