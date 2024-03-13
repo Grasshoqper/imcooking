@@ -37,6 +37,9 @@ public class Robot extends TimedRobot {
   // drive
   AHRS navx;
 
+  double driveOutputSpeed = 0; // Declare at class level
+  double drivePosition = 0; // Declare at class level
+  double driveError = 0; // Declare at class level
 
   @Override 
   public void robotInit() {
@@ -141,7 +144,14 @@ public class Robot extends TimedRobot {
       intakeMoving = false;
     }
 
-    // flywheel encoder 
+    // auto drive 
+    double drivePosition = driveRightEncoder.getDistance();
+
+    double driveError = setpoint - drivePosition;
+
+    double driveOutputSpeed = driveKP * driveError;             
+
+    double driveAngle = navx.getAngle();
   }
 
   private static final String DefaultAuto = "Default";
@@ -173,14 +183,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    
-    double drivePosition = driveLeftEncoder.getDistance();
-
-    double driveError = setpoint - drivePosition;
-
-    double driveOutputSpeed = driveKP * driveError;             
-
-    double driveAngle = navx.getAngle();
 
 
 
@@ -221,7 +223,7 @@ public class Robot extends TimedRobot {
 
     if (speakerSequenceOver)
     {
-      driveSetpoint = 100;
+      driveSetpoint = -1475;
       speakerSequenceOver = false;
       autoPart2 = true;
     }
