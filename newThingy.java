@@ -174,6 +174,7 @@ public class Robot extends TimedRobot {
     System.out.println("Auto selected: " + m_autoSelected);
 
     flywheelEncoder.setPosition(0);
+    driveSetpoint = 0;
 
   }
   boolean speakerSequenceOver = false;
@@ -198,7 +199,7 @@ public class Robot extends TimedRobot {
     boolean flywheels = true;
     
     driveRightA.set(driveOutputSpeed);
-    driveRightB.set(driveOutputSpeed);
+    driveLeftA.set(-driveOutputSpeed);
 
     if (flywheels) {
       double flywheelPosition = flywheelEncoder.getPosition();
