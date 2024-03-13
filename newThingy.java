@@ -105,6 +105,8 @@ public class Robot extends TimedRobot {
   double outputSpeed = 0;
   double sensorPosition = 0;
   double error = 0;
+  double flywheelPosition = 0;
+  double flywheelPositionActive = 0;
 
   boolean intakeMoving = false;
 
