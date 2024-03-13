@@ -370,13 +370,13 @@ public class Robot extends TimedRobot {
       flywheelRight.set(0.95);
     }
 
-    if (flywheelPositionActive > revTime && buttonPressed && speakers) 
+    if (flywheelPositionActive > revTime && speakers) 
     {
       intake.set(-0.25);
       
     }
 
-    if (flywheelPositionActive > endShoot && buttonPressed && speakers) 
+    if (flywheelPositionActive > endShoot && speakers) 
     {
       flywheelLeft.set(0);
       flywheelRight.set(0);
