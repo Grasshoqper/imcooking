@@ -37,13 +37,7 @@ public class Robot extends TimedRobot {
   // drive
   AHRS navx;
 
-  double driveSetpoint = 0;
-  double driveOutputSpeed = 0; 
-  double drivePosition = 0; 
-  double driveError = 0; 
-  double outputSpeed = 0;
-  double sensorPosition = 0;
-  double error = 0;
+  
 
 
 
@@ -104,6 +98,13 @@ public class Robot extends TimedRobot {
   final double kP = 0.015;
 
   double setpoint = 0;
+  double driveSetpoint = 0;
+  double driveOutputSpeed = 0; 
+  double drivePosition = 0; 
+  double driveError = 0; 
+  double outputSpeed = 0;
+  double sensorPosition = 0;
+  double error = 0;
 
   boolean intakeMoving = false;
 
@@ -115,12 +116,12 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Right Drive", driveRightDistance);
     SmartDashboard.putNumber("Left Drive", driveLeftDistance);
 
-    double sensorPosition = intakePivotEncoder.getPosition();
+    sensorPosition = intakePivotEncoder.getPosition();
 
     // calculations
-    double error = setpoint - sensorPosition;
+    error = setpoint - sensorPosition;
 
-    double outputSpeed = kP * error;
+    outputSpeed = kP * error;
 
     // intake pivot
     if (driveControllerB.getRightBumper()) // intake down/out
@@ -151,12 +152,12 @@ public class Robot extends TimedRobot {
     }
 
     // auto drive 
-    double drivePosition = driveRightEncoder.getDistance();
+    drivePosition = driveRightEncoder.getDistance();
 
-    double driveError = setpoint - drivePosition;
+    driveError = setpoint - drivePosition;
 
-    double driveOutputSpeed = driveKP * driveError;             
-
+    driveOutputSpeed = driveKP * driveError;             
+    
     
   }
 
