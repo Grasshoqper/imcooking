@@ -112,10 +112,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    double driveRightDistance = driveRightEncoder.getDistance();
     double driveLeftDistance = driveLeftEncoder.getDistance();
 
-    SmartDashboard.putNumber("Right Drive", driveRightDistance);
+   
     SmartDashboard.putNumber("Left Drive", driveLeftDistance);
     SmartDashboard.putNumber("drive setpoint", driveSetpoint);
 
@@ -154,12 +153,7 @@ public class Robot extends TimedRobot {
       intakeMoving = false;
     }
 
-    // auto drive 
-    drivePosition = driveRightEncoder.getDistance();
-
-    driveError = driveSetpoint - drivePosition;
-
-    driveOutputSpeed = driveKP * driveError;             
+              
     
     
   }
@@ -195,6 +189,39 @@ public class Robot extends TimedRobot {
 
     double driveAngle = navx.getAngle();
     double flywheelPositionActive = flywheelEncoder.getPosition();
+
+    double driveRightDistance = driveRightEncoder.getDistance();
+
+    // auto drive 
+    drivePosition = driveRightDistance;
+
+    driveError = driveSetpoint - drivePosition;
+
+    driveOutputSpeed = driveKP * driveError;   
+
+    sensorPosition = intakePivotEncoder.getPosition();
+
+    // calculations
+    error = setpoint - sensorPosition;
+
+    outputSpeed = kP * error;
+
+    double plusSetpoint = setpoint + 1.5;
+    double minusSetpoint = setpoint - 1.5;
+
+    if (!intakeMoving && sensorPosition < minusSetpoint || sensorPosition > plusSetpoint)
+    {
+      intake.set(0.15);
+      intakeMoving = true;
+    }
+    else if (intakeMoving && sensorPosition > minusSetpoint && sensorPosition < plusSetpoint)
+    {
+      intake.set(0);
+      intakeMoving = false;
+    }
+
+    
+    intakePivot.set(outputSpeed); // setting pivot motor to the pid calculations
 
     switch (m_autoSelected) {
       case MiddleTwoNoteAuto:
