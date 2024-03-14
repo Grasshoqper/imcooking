@@ -98,7 +98,7 @@ public class Robot extends TimedRobot {
   final double kP = 0.015;
 
   double setpoint = 0;
-  double driveSetpointA = -250;
+  double driveSetpointA = 0;
   double driveOutputSpeed = 0; 
   double drivePosition = 0; 
   double driveError = 0; 
@@ -119,6 +119,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Right Drive", driveRightDistance);
     SmartDashboard.putNumber("Left Drive", driveLeftDistance);
     SmartDashboard.putNumber("drive setpoint", driveSetpointA);
+    SmartDashboard.putBoolean("speakersequence over", speakerSequenceOver);
 
     sensorPosition = intakePivotEncoder.getPosition();
 
@@ -185,14 +186,11 @@ public class Robot extends TimedRobot {
   double driveAngle;
   boolean autoPart2 = false;
   boolean autoPart3 = false;
-  boolean autoPart4 = false;
 
   final double driveKP = 0.05;
 
   private double revTime = 0.0;
   private double endShoot = 0.0;
-  double driveRightSpeed = 0.0;
-  double driveLeftSpeed = 0.0;
 
   @Override
   public void autonomousPeriodic() {
@@ -203,8 +201,8 @@ public class Robot extends TimedRobot {
     switch (m_autoSelected) {
       case MiddleTwoNoteAuto:
     
-    driveLeftA.set(driveLeftSpeed);
-    driveRightA.set(driveRightSpeed);
+    driveLeftA.set(-driveOutputSpeed);
+    driveRightA.set(-driveOutputSpeed);
 
     if (flywheels) {
       flywheelPosition = flywheelEncoder.getPosition();
@@ -231,42 +229,35 @@ public class Robot extends TimedRobot {
 
       flywheels = false;
       speakerSequenceOver = true;
-
-      driveLeftSpeed = 0.25;
-      driveRightSpeed = 0.25;
-      autoPart2 = true;
     }
 
-    if (autoPart2 && drivePosition < -950) 
+    if (speakerSequenceOver)
+    {
+      speakerSequenceOver = false;
+      autoPart2 = true;
+      driveSetpointA = -200;
+    }
+
+    if (autoPart2 && drivePosition < -150) 
     {
       setpoint = 16.25;
     }
 
-    if (autoPart2 && drivePosition < -1200)
+    if (autoPart2 && drivePosition < -250)
     {
       intake.set(0.35);
-      driveLeftSpeed = 0.1;
-      driveRightSpeed = 0.1;
       autoPart2 = false;
       autoPart3 = true;
     }
 
     if (autoPart3 && drivePosition < -1450)
     {
-      driveRightSpeed = -0.25;
-      driveLeftSpeed = -0.25;
+      driveSetpointA = 0;
       setpoint = 0.25;
     } 
-    if (autoPart3 && drivePosition > -350)
+    if (autoPart3 && drivePosition > -50)
     {
-      driveRightSpeed = -0.1;
-      driveLeftSpeed = -0.1;
       flywheels = true;
-    }
-    if (autoPart4 && drivePosition > -50)
-    {
-      driveRightSpeed = 0;
-      driveLeftSpeed = 0;
     }
 
 
