@@ -185,11 +185,14 @@ public class Robot extends TimedRobot {
   double driveAngle;
   boolean autoPart2 = false;
   boolean autoPart3 = false;
+  boolean autoPart4 = false;
 
   final double driveKP = 0.05;
 
   private double revTime = 0.0;
   private double endShoot = 0.0;
+  double driveRightSpeed = 0.0;
+  double driveLeftSpeed = 0.0;
 
   @Override
   public void autonomousPeriodic() {
@@ -200,7 +203,8 @@ public class Robot extends TimedRobot {
     switch (m_autoSelected) {
       case MiddleTwoNoteAuto:
     
-    
+    driveLeftA.set(driveLeftSpeed);
+    driveRightA.set(driveRightSpeed);
 
     if (flywheels) {
       flywheelPosition = flywheelEncoder.getPosition();
@@ -227,36 +231,42 @@ public class Robot extends TimedRobot {
 
       flywheels = false;
       speakerSequenceOver = true;
-    }
 
-    if (speakerSequenceOver)
-    {
-      driveRightA.set(-driveOutputSpeed);
-      driveLeftA.set(-driveOutputSpeed);
-      speakerSequenceOver = false;
+      driveLeftSpeed = 0.25;
+      driveRightSpeed = 0.25;
       autoPart2 = true;
     }
 
-    if (autoPart2 && drivePosition < -150) 
+    if (autoPart2 && drivePosition < -950) 
     {
       setpoint = 16.25;
     }
 
-    if (autoPart2 && drivePosition < -250)
+    if (autoPart2 && drivePosition < -1200)
     {
       intake.set(0.35);
+      driveLeftSpeed = 0.1;
+      driveRightSpeed = 0.1;
       autoPart2 = false;
       autoPart3 = true;
     }
 
     if (autoPart3 && drivePosition < -1450)
     {
-      driveSetpointA = 0;
+      driveRightSpeed = -0.25;
+      driveLeftSpeed = -0.25;
       setpoint = 0.25;
     } 
-    if (autoPart3 && drivePosition > -50)
+    if (autoPart3 && drivePosition > -350)
     {
+      driveRightSpeed = -0.1;
+      driveLeftSpeed = -0.1;
       flywheels = true;
+    }
+    if (autoPart4 && drivePosition > -50)
+    {
+      driveRightSpeed = 0;
+      driveLeftSpeed = 0;
     }
 
 
