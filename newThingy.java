@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
   driveRightB.follow(driveRightA);
 
   // drive
-
+  
 
 
   
@@ -357,12 +357,12 @@ public class Robot extends TimedRobot {
     flywheelPositionActive = flywheelEncoder.getPosition();
     boolean speakers = false;   
 
-    if (driveControllerA.getRightBumper() && !buttonPressed && !speakers) {
+    if (driveControllerA.getRightBumper() && !speakers) {
       flywheelPosition = flywheelEncoder.getPosition();
       revTime = flywheelPosition + 150;
       endShoot = flywheelPosition + 250;
 
-      buttonPressed = true;
+
       speakers = true;
     }
     
@@ -384,18 +384,17 @@ public class Robot extends TimedRobot {
       flywheelRight.set(0);
       intake.set(0);
 
-      buttonPressed = false;
+
       speakers = false;
     }
     
     boolean amps = false;
 
-    if (driveControllerB.getBButton() && !buttonPressed && !amps) {
+    if (driveControllerB.getBButton() && !amps) {
       flywheelPosition = flywheelEncoder.getPosition();
       revTime = flywheelPosition + 25;
       endShoot = flywheelPosition + 150;
 
-      buttonPressed = true;
       amps = true;
     }
     
@@ -405,19 +404,19 @@ public class Robot extends TimedRobot {
       flywheelRight.set(0.95);
     }
 
-    if (flywheelPositionActive > revTime && buttonPressed && amps) 
+    if (flywheelPositionActive > revTime && amps) 
     {
       intake.set(-0.25);
       
     }
 
-    if (flywheelPositionActive > endShoot && buttonPressed && amps) 
+    if (flywheelPositionActive > endShoot && amps) 
     {
       flywheelLeft.set(0);
       flywheelRight.set(0);
       intake.set(0);
 
-      buttonPressed = false;
+
       amps = false;
     }
     
