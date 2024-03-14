@@ -156,85 +156,86 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        double driveAngle = navx.getAngle();
-        flywheelPositionActive = flywheelEncoder.getPosition();
-
-        switch (m_autoSelected) {
-            case MiddleTwoNoteAuto:
-                driveLeftA.set(-driveOutputSpeed);
-                driveRightA.set(-driveOutputSpeed);
-
-                if (flywheels) {
-                    flywheelPosition = flywheelEncoder.getPosition();
-                    revTime = flywheelPosition + 150;
-                    endShoot = flywheelPosition + 250;
-                }
-
-                if (flywheelPositionActive < endShoot && flywheels) {
-                    flywheelLeft.set(1);
-                    flywheelRight.set(0.95);
-                }
-
-                if (flywheelPositionActive > revTime && flywheels) {
-                    intake.set(-0.25);
-                }
-
-                if (flywheelPositionActive > endShoot && flywheels) {
-                    flywheelLeft.set(0);
-                    flywheelRight.set(0);
-                    intake.set(0);
-
-                    flywheels = false;
-                    speakerSequenceOver = true;
-                }
-
-                if (speakerSequenceOver) {
-                    autoPart2 = true;
-                    driveSetpointA = -200;
-                }
-
-                if (autoPart2 && drivePosition < -150) {
-                    setpoint = 16.25;
-                }
-
-                if (autoPart2 && drivePosition < -250) {
-                    intake.set(0.35);
-                    autoPart2 = false;
-                    autoPart3 = true;
-                }
-
-                if (autoPart3 && drivePosition < -1450) {
-                    driveSetpointA = 0;
-                    setpoint = 0.25;
-                }
-                if (autoPart3 && drivePosition > -50) {
-                    flywheels = true;
-                }
-
-                break;
-
-            case DefaultAuto:
-            default:
-                flywheelPositionActive = flywheelEncoder.getPosition();
-                double revTime = 140;
-                double endShoot = 200;
-
-                if (flywheelPositionActive < endShoot) {
-                    flywheelLeft.set(1);
-                    flywheelRight.set(0.95);
-                }
-
-                if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) {
-                    intake.set(-0.25);
-                }
-
-                if (flywheelPositionActive > endShoot) {
-                    flywheelLeft.set(0);
-                    flywheelRight.set(0);
-                    intake.set(0);
-                }
-
-                break;
+      double driveAngle = navx.getAngle();
+      flywheelPositionActive = flywheelEncoder.getPosition();
+  
+      switch (m_autoSelected) {
+          case MiddleTwoNoteAuto:
+              driveLeftA.set(-driveOutputSpeed);
+              driveRightA.set(-driveOutputSpeed);
+  
+              if (flywheels) {
+                  flywheelPosition = flywheelEncoder.getPosition();
+                  revTime = flywheelPosition + 150;
+                  endShoot = flywheelPosition + 250;
+              }
+  
+              if (flywheelPositionActive < endShoot && flywheels) {
+                  flywheelLeft.set(1);
+                  flywheelRight.set(0.95);
+              }
+  
+              if (flywheelPositionActive > revTime && flywheels) {
+                  intake.set(-0.25);
+              }
+  
+              if (flywheelPositionActive > endShoot && flywheels) {
+                  flywheelLeft.set(0);
+                  flywheelRight.set(0);
+                  intake.set(0);
+  
+                  flywheels = false;
+                  speakerSequenceOver = true;
+              }
+  
+              if (speakerSequenceOver) {
+                  speakerSequenceOver = false; // Reset flag
+                  autoPart2 = true;
+                  driveSetpointA = -200;
+              }
+  
+              if (autoPart2 && drivePosition < -150) {
+                  setpoint = 16.25;
+              }
+  
+              if (autoPart2 && drivePosition < -250) {
+                  intake.set(0.35);
+                  autoPart2 = false;
+                  autoPart3 = true;
+              }
+  
+              if (autoPart3 && drivePosition < -1450) {
+                  driveSetpointA = 0;
+                  setpoint = 0.25;
+              }
+              if (autoPart3 && drivePosition > -50) {
+                  flywheels = true;
+              }
+  
+              break;
+  
+          case DefaultAuto:
+          default:
+              flywheelPositionActive = flywheelEncoder.getPosition();
+              double revTime = 140;
+              double endShoot = 200;
+  
+              if (flywheelPositionActive < endShoot) {
+                  flywheelLeft.set(1);
+                  flywheelRight.set(0.95);
+              }
+  
+              if (flywheelPositionActive < endShoot && flywheelPositionActive > revTime) {
+                  intake.set(-0.25);
+              }
+  
+              if (flywheelPositionActive > endShoot) {
+                  flywheelLeft.set(0);
+                  flywheelRight.set(0);
+                  intake.set(0);
+              }
+  
+              break;
         }
     }
 
