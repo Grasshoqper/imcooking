@@ -22,6 +22,8 @@ public class Robot extends TimedRobot {
   CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
   CANSparkMax driveRightB = new CANSparkMax(5, MotorType.kBrushed);
+  CANSparkMax climbLeft = new CANSparkMax(3, MotorType.kBrushless);
+  CANSparkMax climbRight = new CANSparkMax(8, MotorType.kBrushless);
   
   // controllers
   XboxController driveControllerA = new XboxController(1);
@@ -30,6 +32,9 @@ public class Robot extends TimedRobot {
   // encodershnbgf
   private RelativeEncoder intakePivotEncoder;
   private RelativeEncoder flywheelEncoder;
+
+  private RelativeEncoder climbRightEncoder;
+  private RelativeEncoder climbLeftEncoder; 
 
   Encoder driveLeftEncoder;
   Encoder driveRightEncoder;
@@ -67,6 +72,8 @@ public class Robot extends TimedRobot {
   // encoders
   intakePivotEncoder = intakePivot.getEncoder();
   flywheelEncoder = flywheelLeft.getEncoder();
+  climbLeftEncoder = climbLeft.getEncoder();
+  climbRightEncoder = climbRight.getEncoder();
 
   flywheelEncoder.setPosition(0);
   intakePivotEncoder.setPosition(0);
@@ -167,7 +174,38 @@ public class Robot extends TimedRobot {
 
     double driveError = setpoint - drivePosition;
 
-    double driveOutputSpeed = driveKP * driveError;             
+    double driveOutputSpeed = driveKP * driveError;
+    
+    double climbLeftPosition = climbLeftEncoder.getPosition();
+    double climbRightPosition = climbRightEncoder.getPosition();
+
+    if (climbLeftPosition > 100)
+    {
+      climbLeft.set(0);
+    }
+    if (climbRightPosition > 100)
+    {
+      climbRight.set(0);
+    }
+    if (climbRightPosition < 0)
+    {
+      climbRight.set(0);
+    }
+    if (climbLeftPosition < 0)
+    {
+      climbLeft.set(0);
+    }
+    if (driveControllerB.getAButton())
+    {
+      climbRight.set(0.15);
+      climbLeft.set(0.15);
+    }
+    if (driveControllerB.getBButton())
+    {
+      climbRight.set(-1);
+      climbLeft.set(-1);
+    }
+
 
     
   }
