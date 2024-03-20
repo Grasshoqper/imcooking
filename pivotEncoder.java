@@ -20,6 +20,8 @@ public class Robot extends TimedRobot {
   CANSparkMax intakePivot = new CANSparkMax(7, MotorType.kBrushless);
   CANSparkMax driveRightA = new CANSparkMax(9, MotorType.kBrushed);
   CANSparkMax driveRightB = new CANSparkMax(5, MotorType.kBrushed);
+  CANSparkMax climbLeft = new CANSparkMax(3, MotorType.kBrushless);
+  CANSparkMax climbRight = new CANSparkMax(8, MotorType.kBrushless);
   
   // controllers
   XboxController driveControllerA = new XboxController(0);
@@ -27,7 +29,8 @@ public class Robot extends TimedRobot {
 
   // encoders
   private RelativeEncoder intakePivotEncoder;
-
+  private RelativeEncoder climbLefEncoder;
+  private RelativeEncoder climbRightEncoder;
 
 
   // drive
@@ -43,6 +46,7 @@ public class Robot extends TimedRobot {
   flywheelRight.setInverted(false);
   intakePivot.setInverted(false);
   driveRightA.setInverted(false);
+  climbLeft.setInverted(true);
 
 
   // set all speeds 0
@@ -59,6 +63,8 @@ public class Robot extends TimedRobot {
   
   // encoders
   intakePivotEncoder = intakePivot.getEncoder();
+  climbRightEncoder = climbRight.getEncoder();
+  climbLefEncoder = climbLeft.getEncoder();
   
 
   // setting slave motors
@@ -114,6 +120,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // encoders
     SmartDashboard.putNumber("Encoder Position", intakePivotEncoder.getPosition());
+    SmartDashboard.putNumber("climb left", climbLefEncoder.getPosition());
+    SmartDashboard.putNumber("climb right", climbRightEncoder.getPosition());
 
     intakePivot.set(driveControllerB.getLeftY() * 0.5);
     // drive
